@@ -1,0 +1,41 @@
+# Default values for the opspilot chart. Every value here is
+# deliberately safe-by-default: llmProvider defaults to "mock" (never
+# silently bills a real LLM account just because the chart was
+# installed), and replicaCount/resources are sized for a demo cluster,
+# not production load -- see the project doc's "honest weaknesses"
+# section for the explicit note on what would change for real scale.
+
+replicaCount: 1
+
+image:
+  repository: opspilot-agent
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+config:
+  targetRepo: ""        # owner/repo the agent watches -- required, no sane default
+  llmProvider: "mock"   # mock | openai | anthropic
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+probes:
+  livenessInitialDelaySeconds: 5
+  readinessInitialDelaySeconds: 2
+
+serviceMonitor:
+  # Off by default -- only meaningful on a cluster that already has
+  # the Prometheus Operator's CRDs installed, which an ephemeral demo
+  # `kind` cluster does not have unless CI explicitly adds them.
+  enabled: false
+  interval: 15s

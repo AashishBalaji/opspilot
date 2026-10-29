@@ -1,0 +1,18 @@
+apiVersion: v2
+name: opspilot
+description: >
+  Agentic CI/CD diagnosis co-pilot with a human-in-the-loop governance
+  gate. Packages the agent's Deployment, Service, ConfigMap, and
+  ServiceMonitor so it can be installed with `helm install` directly,
+  or orchestrated by Terraform's helm_release resource (see
+  infra/terraform/) -- both paths install the exact same chart, so
+  there's one source of truth for what actually gets deployed.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - devops
+  - agentic-ai
+  - ci-cd
+maintainers:
+  - name: Nishalini Maran

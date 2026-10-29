@@ -1,0 +1,8 @@
+OpsPilot has been installed.
+
+Check the agent is healthy:
+  kubectl --namespace {{ .Release.Namespace }} port-forward svc/opspilot-agent 8000:{{ .Values.service.port }}
+  curl http://localhost:8000/health
+
+Pending proposals (the human-in-the-loop queue):
+  curl http://localhost:8000/proposals?status=pending

@@ -1,0 +1,77 @@
+{
+  "title": "OpsPilot — Agent Quality, Reliability & Cost",
+  "uid": "opspilot-agent",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Proposals created (by kind)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (kind) (rate(opspilot_proposals_created_total[5m]))",
+          "legendFormat": "{{kind}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Approval vs. rejection rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "description": "The single most important quality signal: a healthy agent should see its acceptance rate stay high and stable over time. A dropping acceptance rate is the earliest warning sign that diagnoses have gotten worse, before anything 'breaks' outright.",
+      "targets": [
+        {
+          "expr": "sum by (decision) (rate(opspilot_proposals_decided_total[1h]))",
+          "legendFormat": "{{decision}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Diagnosis latency (p50 / p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(opspilot_diagnosis_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(opspilot_diagnosis_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "LLM tokens consumed (cost proxy, by provider)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "description": "Raw token counts, split prompt vs. completion. Multiply by the provider's published per-token price outside Grafana (left as a recording rule or a per-provider pricing table, not hardcoded here, since prices change and shouldn't require a dashboard edit to update).",
+      "targets": [
+        {
+          "expr": "sum by (provider, kind) (rate(opspilot_llm_tokens_total[1h]))",
+          "legendFormat": "{{provider}} / {{kind}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Proposals executed (by kind)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "description": "Should always be <= proposals approved -- if this ever exceeds the approved count, something bypassed the governance gate, which would itself be a critical incident.",
+      "targets": [
+        {
+          "expr": "sum by (kind) (rate(opspilot_proposals_executed_total[1h]))",
+          "legendFormat": "{{kind}}"
+        }
+      ]
+    }
+  ]
+}
